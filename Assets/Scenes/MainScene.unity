@@ -789,7 +789,7 @@ MonoBehaviour:
   birdSpawnInterval: 10
   leafSpawnInterval: 15
   cloudSpawnAreaXMin: -8
-  cloudSpawnAreaXMax: -10
+  cloudSpawnAreaXMax: -20
   cloudSpawnAreaYMin: -4
   cloudSpawnAreaYMax: 1
   spawnAreaWidth: 10

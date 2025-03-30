@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
-  lifeTime: 60
+  lifeTime: 20
   mysteryBoxPrefab: {fileID: 5345070061376912475, guid: 5113a969e50f5064b8caae159376b835, type: 3}
   mysteryBoxSpawnIntervalMin: 0.5
   mysteryBoxSpawnIntervalMax: 1.5

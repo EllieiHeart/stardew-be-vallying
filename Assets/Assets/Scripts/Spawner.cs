@@ -35,33 +35,27 @@ public class Spawner : MonoBehaviour
     private CloudPool cloudPool;
     private GameObject currentBird;
     private Camera mainCamera;
+    private GameObject currentMrQi; // Track the current Mr. Qi instance
 
     void Start()
     {
-        // 1. Cache the main camera
         mainCamera = Camera.main;
+
         if (mainCamera == null)
         {
             Debug.LogError("Main Camera not found! Spawning may not work correctly.");
-            return; // Important: Exit Start() if no camera
         }
 
-        // 2. Find the CloudPool
         cloudPool = Object.FindFirstObjectByType<CloudPool>();
         if (cloudPool == null)
         {
             Debug.LogError("CloudPool not found in the scene! Clouds will not spawn.");
-            return; // Important: Exit Start() if no CloudPool
         }
-
-        // 3. Initialize available perches (even if empty)
         availablePerches = new List<Transform>(birdPerches);
-
-        // 4. Start coroutines (in a specific order)
         StartCoroutine(SpawnClouds());
         StartCoroutine(ManageSingleBird());
         StartCoroutine(SpawnStars());
-        StartCoroutine(SpawnMrQi());
+        StartCoroutine(ManageMrQiSpawning()); // Changed from SpawnMrQi()
     }
 
     IEnumerator SpawnClouds()
@@ -122,18 +116,24 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    IEnumerator SpawnMrQi()
+    IEnumerator ManageMrQiSpawning() // Changed from SpawnMrQi()
     {
-        yield return new WaitForSeconds(mrQiSpawnDelay);
-
-        if (mainCamera != null && mrQiPrefab != null)
+        while (true)
         {
-            float spawnX = -mainCamera.orthographicSize * mainCamera.aspect - 2f;
-            float spawnY = 0f;
-            Vector3 spawnPosition = new Vector3(spawnX, spawnY, 0);
-            GameObject mrQi = Instantiate(mrQiPrefab, spawnPosition, Quaternion.identity);
+            yield return new WaitForSeconds(mrQiSpawnDelay);
 
-            MrQi mrQiScript = mrQi.AddComponent<MrQi>();
+            if (mainCamera != null && mrQiPrefab != null)
+            {
+                // Spawn Mr. Qi at the left edge of the screen and y=0
+                float spawnY = 0f;
+                float spawnX = -mainCamera.orthographicSize * mainCamera.aspect - 2f;
+                Vector3 spawnPosition = new Vector3(spawnX, spawnY, 0);
+                currentMrQi = Instantiate(mrQiPrefab, spawnPosition, Quaternion.identity); // Track Mr. Qi
+                MrQi mrQiScript = currentMrQi.GetComponent<MrQi>();
+
+                // Despawn Mr. Qi after his lifetime
+                Destroy(currentMrQi, mrQiSpawnDelay);
+            }
         }
     }
 

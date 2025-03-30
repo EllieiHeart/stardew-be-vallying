@@ -70,6 +70,7 @@ public class Cloud : MonoBehaviour
 
         if (alpha <= 0)
         {
+            
             Destroy(gameObject);
         }
     }

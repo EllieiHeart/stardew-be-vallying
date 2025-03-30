@@ -3,65 +3,48 @@ using UnityEngine;
 public class Bird : MonoBehaviour
 {
     public float speed = 3f;
-    public float forageTime = 2f;
-    public float perchTime = 3f;
-    public float forageDip = 0.5f;
-    public Transform[] perchPoints; // Assign these in the Inspector
+    public float perchStayTime = 2f; // Time the bird stays on the perch
 
-    private string state = "flying";
+    private string state = "flyingToPerch";
     private float stateTimer = 0f;
-    private Vector3 targetPosition;
-    private Vector3 startPosition;
+    private Transform targetPerch;
+    private Spawner spawner; // Reference to the Spawner script
 
-    void Start()
+    public void SetTargetPerchAndSpawner(Transform perch, Spawner spawner)
     {
-        startPosition = transform.position;
-        targetPosition = new Vector3(Random.Range(-10f, 10f), Random.Range(-5f, 5f), 0);
+        targetPerch = perch;
+        this.spawner = spawner;
+        state = "flyingToPerch";
     }
 
     void Update()
     {
-        if (state == "flying")
+        if (targetPerch == null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-            if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+            Destroy(gameObject); // Should not happen if Spawner works correctly
+            return;
+        }
+
+        if (state == "flyingToPerch")
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPerch.position, speed * Time.deltaTime);
+            if (Vector3.Distance(transform.position, targetPerch.position) < 0.1f)
             {
-                if (Random.value < 0.2f) // 20% chance to forage
-                {
-                    state = "foraging";
-                    stateTimer = forageTime;
-                }
-                else if (perchPoints.Length > 0 && Random.value < 0.1f) // 10% chance to perch
-                {
-                    state = "perching";
-                    stateTimer = perchTime;
-                    targetPosition = perchPoints[Random.Range(0, perchPoints.Length)].position;
-                }
-                else
-                {
-                    targetPosition = new Vector3(Random.Range(-10f, 10f), Random.Range(-5f, 5f), 0);
-                }
+                state = "perched";
+                stateTimer = perchStayTime;
             }
         }
-        else if (state == "foraging")
+        else if (state == "perched")
         {
-            transform.Translate(0, -forageDip * Time.deltaTime, 0);
             stateTimer -= Time.deltaTime;
             if (stateTimer <= 0)
             {
-                transform.position = new Vector3(transform.position.x, startPosition.y, 0); // Return to original Y
-                state = "flying";
-                targetPosition = new Vector3(Random.Range(-10f, 10f), Random.Range(-5f, 5f), 0);
-            }
-        }
-        else if (state == "perching")
-        {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-            stateTimer -= Time.deltaTime;
-            if (stateTimer <= 0)
-            {
-                state = "flying";
-                targetPosition = new Vector3(Random.Range(-10f, 10f), Random.Range(-5f, 5f), 0);
+                // Bird has stayed long enough, inform the spawner to spawn a new one
+                if (spawner != null)
+                {
+                    spawner.BirdDespawned();
+                }
+                Destroy(gameObject);
             }
         }
     }

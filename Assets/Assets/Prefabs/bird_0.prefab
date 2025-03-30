@@ -27,8 +27,8 @@ Transform:
   m_GameObject: {fileID: 966318309382055361}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.392791, y: -1.6974707, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 9.42, y: -2.49, z: -0.06}
+  m_LocalScale: {x: 0.2126, y: 0.227, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -105,8 +105,6 @@ MonoBehaviour:
   perchTime: 3
   forageDip: 0.5
   perchPoints:
-  - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}

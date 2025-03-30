@@ -4,7 +4,7 @@ using Random = UnityEngine.Random;
 public class Cloud : MonoBehaviour
 {
     public float minDriftSpeed = 0.1f;
-    public float maxDriftSpeed = 0.5f;
+    public float maxDriftSpeed = 0.8f;
     public float minSize = 1f;
     public float maxSize = 2f;
 

@@ -101,6 +101,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minDriftSpeed: 0.1
-  maxDriftSpeed: 0.5
+  maxDriftSpeed: 0.8
   minSize: 0.6
-  maxSize: 2.34
+  maxSize: 5

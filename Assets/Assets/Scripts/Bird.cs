@@ -3,12 +3,18 @@ using UnityEngine;
 public class Bird : MonoBehaviour
 {
     public float speed = 3f;
-    public float perchStayTime = 2f; // Time the bird stays on the perch
+    public float perchStayTime = 2f;
 
     private string state = "flyingToPerch";
     private float stateTimer = 0f;
     private Transform targetPerch;
-    private Spawner spawner; // Reference to the Spawner script
+    private Spawner spawner;
+    private SpriteRenderer spriteRenderer;
+
+    void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
     public void SetTargetPerchAndSpawner(Transform perch, Spawner spawner)
     {
@@ -21,13 +27,24 @@ public class Bird : MonoBehaviour
     {
         if (targetPerch == null)
         {
-            Destroy(gameObject); // Should not happen if Spawner works correctly
+            Destroy(gameObject);
             return;
         }
 
         if (state == "flyingToPerch")
         {
+            // Determine direction and flip sprite (reversed)
+            if (targetPerch.position.x > transform.position.x)
+            {
+                spriteRenderer.flipX = true;  // Face left when moving right
+            }
+            else
+            {
+                spriteRenderer.flipX = false; // Face right when moving left
+            }
+
             transform.position = Vector3.MoveTowards(transform.position, targetPerch.position, speed * Time.deltaTime);
+
             if (Vector3.Distance(transform.position, targetPerch.position) < 0.1f)
             {
                 state = "perched";
@@ -39,7 +56,6 @@ public class Bird : MonoBehaviour
             stateTimer -= Time.deltaTime;
             if (stateTimer <= 0)
             {
-                // Bird has stayed long enough, inform the spawner to spawn a new one
                 if (spawner != null)
                 {
                     spawner.BirdDespawned();

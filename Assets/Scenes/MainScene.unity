@@ -795,7 +795,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 893705f0dbdb7b44993c732117b03176, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 893705f0dbdb7b44993c732117b03176, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.226
@@ -930,7 +930,7 @@ MonoBehaviour:
   starPrefab: {fileID: 3231677581885443523, guid: 9692de3c82fb6ee46899876c87e97105, type: 3}
   mrQiPrefab: {fileID: 9010709484311907815, guid: c1739a8579d44f646876e78686f6e236, type: 3}
   cloudSpawnInterval: 15
-  birdSpawnInterval: 10
+  birdSpawnInterval: 5
   starSpawnInterval: 2
   mrQiSpawnDelay: 60
   cloudSpawnAreaXMin: -8

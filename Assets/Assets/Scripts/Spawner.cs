@@ -11,6 +11,7 @@ public class Spawner : MonoBehaviour
     public GameObject starPrefab;
     public GameObject mrQiPrefab;
 
+    private GameObject currentMrQi; // Declare currentMrQi at the class level
     public float cloudSpawnInterval = 2f;
     public float birdSpawnInterval = 10f;
     public float starSpawnInterval = 1f;
@@ -35,27 +36,33 @@ public class Spawner : MonoBehaviour
     private CloudPool cloudPool;
     private GameObject currentBird;
     private Camera mainCamera;
-    private GameObject currentMrQi; // Track the current Mr. Qi instance
 
     void Start()
     {
+        // Cache the main camera
         mainCamera = Camera.main;
-
         if (mainCamera == null)
         {
             Debug.LogError("Main Camera not found! Spawning may not work correctly.");
+            return;
         }
 
+        // Find the CloudPool
         cloudPool = Object.FindFirstObjectByType<CloudPool>();
         if (cloudPool == null)
         {
             Debug.LogError("CloudPool not found in the scene! Clouds will not spawn.");
+            return;
         }
+
+        // Initialize available perches
         availablePerches = new List<Transform>(birdPerches);
+
+        // Start coroutines
         StartCoroutine(SpawnClouds());
         StartCoroutine(ManageSingleBird());
         StartCoroutine(SpawnStars());
-        StartCoroutine(ManageMrQiSpawning()); // Changed from SpawnMrQi()
+        StartCoroutine(ManageMrQiSpawning());
     }
 
     IEnumerator SpawnClouds()
@@ -100,23 +107,32 @@ public class Spawner : MonoBehaviour
             {
                 canSpawnBird = false;
 
+                // Choose a random perch
                 int randomIndex = Random.Range(0, availablePerches.Count);
                 Transform targetPerch = availablePerches[randomIndex];
                 availablePerches.RemoveAt(randomIndex);
 
+                // Spawn the bird
                 GameObject newBirdObj = Instantiate(birdPrefab, GetBirdSpawnPosition(), Quaternion.identity);
                 currentBird = newBirdObj;
                 Bird birdScript = newBirdObj.GetComponent<Bird>();
                 if (birdScript != null)
                 {
                     birdScript.SetTargetPerchAndSpawner(targetPerch, this);
+                    birdScript.ChangeState(Bird.BirdState.FlyingToPerch);
                 }
+
+                yield return new WaitForSeconds(birdSpawnDelay);
+                canSpawnBird = true;
             }
-            yield return null;
+            else
+            {
+                yield return null; // Wait until a perch is free or the delay is over
+            }
         }
     }
 
-    IEnumerator ManageMrQiSpawning() // Changed from SpawnMrQi()
+    IEnumerator ManageMrQiSpawning()
     {
         while (true)
         {
@@ -124,11 +140,11 @@ public class Spawner : MonoBehaviour
 
             if (mainCamera != null && mrQiPrefab != null)
             {
-                // Spawn Mr. Qi at the left edge of the screen and y=0
-                float spawnY = 0f;
                 float spawnX = -mainCamera.orthographicSize * mainCamera.aspect - 2f;
+                float spawnY = 0f;
                 Vector3 spawnPosition = new Vector3(spawnX, spawnY, 0);
-                currentMrQi = Instantiate(mrQiPrefab, spawnPosition, Quaternion.identity); // Track Mr. Qi
+                currentMrQi = Instantiate(mrQiPrefab, spawnPosition, Quaternion.identity);
+
                 MrQi mrQiScript = currentMrQi.GetComponent<MrQi>();
 
                 // Despawn Mr. Qi after his lifetime

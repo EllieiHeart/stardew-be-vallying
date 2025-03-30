@@ -100,13 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2cf2ea2bb5addf439b83830411eabd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSpeed: 0.5
-  maxSpeed: 1.5
-  minDrift: -0.2
-  maxDrift: 0.2
+  minDriftSpeed: 0.1
+  maxDriftSpeed: 0.5
   minSize: 0.6
-  maxSize: 0.6
-  gatherTime: 10
-  gatherGrowthRate: 0.2
-  gatherFadeRate: 1
-  dissipateFadeRate: 2
+  maxSize: 2.34

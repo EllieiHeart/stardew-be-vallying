@@ -14,6 +14,11 @@ public class Spawner : MonoBehaviour
     public float birdSpawnInterval = 10f;
     public float leafSpawnInterval = 2f;
 
+    public float cloudSpawnAreaXMin = -8f; // Minimum X position for cloud spawn
+    public float cloudSpawnAreaXMax = -2f; // Maximum X position for cloud spawn
+    public float cloudSpawnAreaYMin = -4f; // Minimum Y position for cloud spawn
+    public float cloudSpawnAreaYMax = 4f;  // Maximum Y position for cloud spawn
+
     public float spawnAreaWidth = 12f;
 
     public Transform[] birdPerches;
@@ -32,9 +37,8 @@ public class Spawner : MonoBehaviour
         }
         availablePerches = new List<Transform>(birdPerches);
         StartCoroutine(SpawnClouds());
-        StartCoroutine(SpawnBirds());
+        StartCoroutine(ManageSingleBird()); // Changed from SpawnBirds()
         StartCoroutine(SpawnLeaves());
-        StartCoroutine(ManageSingleBird());
     }
 
     IEnumerator SpawnClouds()
@@ -46,20 +50,15 @@ public class Spawner : MonoBehaviour
                 GameObject cloud = cloudPool.GetPooledCloud();
                 if (cloud != null)
                 {
-                    // Spawn clouds at a random position within the camera's view
-                    float spawnY = Random.Range(-Camera.main.orthographicSize, Camera.main.orthographicSize);
-                    cloud.transform.position = new Vector3(-Camera.main.orthographicSize * Camera.main.aspect - 1f, spawnY, 0);
+                    // Spawn clouds within the defined area
+                    float spawnX = Random.Range(cloudSpawnAreaXMin, cloudSpawnAreaXMax);
+                    float spawnY = Random.Range(cloudSpawnAreaYMin, cloudSpawnAreaYMax);
+                    cloud.transform.position = new Vector3(spawnX, spawnY, 0);
                     cloud.SetActive(true);
                 }
             }
             yield return new WaitForSeconds(cloudSpawnInterval);
         }
-    }
-
-    IEnumerator SpawnBirds()
-    {
-        // This coroutine is now empty. The bird spawning is handled entirely by ManageSingleBird()
-        yield return null;
     }
 
     IEnumerator SpawnLeaves()
@@ -86,7 +85,7 @@ public class Spawner : MonoBehaviour
 
                 GameObject newBirdObj = Instantiate(birdPrefab, GetBirdSpawnPosition(), Quaternion.identity);
                 currentBird = newBirdObj;
-                Bird birdScript = currentBird.GetComponent<Bird>();
+                Bird birdScript = newBirdObj.GetComponent<Bird>();
                 if (birdScript != null)
                 {
                     birdScript.SetTargetPerchAndSpawner(targetPerch, this);

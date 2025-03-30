@@ -784,14 +784,18 @@ MonoBehaviour:
   cloudPrefab: {fileID: 3255961318707151088, guid: 6d88446137364d34abbbaa88793e3e35, type: 3}
   birdPrefab: {fileID: 966318309382055361, guid: 3d7fb907c3e4f644ea2f19e5b2b2805a, type: 3}
   birdSpawnDelay: 5
-  leafPrefab: {fileID: 2489655623341238439, guid: d677b47cfd4594a40ac8e28a6a4e2532, type: 3}
+  starPrefab: {fileID: 3231677581885443523, guid: 9692de3c82fb6ee46899876c87e97105, type: 3}
   cloudSpawnInterval: 15
   birdSpawnInterval: 10
-  leafSpawnInterval: 15
+  starSpawnInterval: 2
   cloudSpawnAreaXMin: -8
   cloudSpawnAreaXMax: -20
   cloudSpawnAreaYMin: -4
-  cloudSpawnAreaYMax: 1
+  cloudSpawnAreaYMax: 5
+  starSpawnAreaXMin: -10
+  starSpawnAreaXMax: 10
+  starSpawnAreaYMin: 0
+  starSpawnAreaYMax: 8
   spawnAreaWidth: 10
   birdPerches:
   - {fileID: 1099397813}

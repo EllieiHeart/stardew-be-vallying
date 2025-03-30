@@ -8,16 +8,21 @@ public class Spawner : MonoBehaviour
     public GameObject cloudPrefab;
     public GameObject birdPrefab;
     public float birdSpawnDelay = 5f;
-    public GameObject leafPrefab;
+    public GameObject starPrefab;
 
     public float cloudSpawnInterval = 2f;
     public float birdSpawnInterval = 10f;
-    public float leafSpawnInterval = 2f;
+    public float starSpawnInterval = 1f;
 
-    public float cloudSpawnAreaXMin = -8f; // Minimum X position for cloud spawn
-    public float cloudSpawnAreaXMax = -2f; // Maximum X position for cloud spawn
-    public float cloudSpawnAreaYMin = -4f; // Minimum Y position for cloud spawn
-    public float cloudSpawnAreaYMax = 4f;  // Maximum Y position for cloud spawn
+    public float cloudSpawnAreaXMin = -8f;
+    public float cloudSpawnAreaXMax = -2f;
+    public float cloudSpawnAreaYMin = -4f;
+    public float cloudSpawnAreaYMax = 4f;
+
+    public float starSpawnAreaXMin = -10f; // Adjusted for full width
+    public float starSpawnAreaXMax = 10f;  // Adjusted for full width
+    public float starSpawnAreaYMin = 0f;    // Stars spawn only on the top half
+    public float starSpawnAreaYMax = 8f;    // Stars spawn only on the top half
 
     public float spawnAreaWidth = 12f;
 
@@ -27,9 +32,17 @@ public class Spawner : MonoBehaviour
     private bool canSpawnBird = true;
     private CloudPool cloudPool;
     private GameObject currentBird;
+    private Camera mainCamera;
 
     void Start()
     {
+        mainCamera = Camera.main;
+
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main Camera not found! Spawning may not work correctly.");
+        }
+
         cloudPool = Object.FindFirstObjectByType<CloudPool>();
         if (cloudPool == null)
         {
@@ -37,20 +50,19 @@ public class Spawner : MonoBehaviour
         }
         availablePerches = new List<Transform>(birdPerches);
         StartCoroutine(SpawnClouds());
-        StartCoroutine(ManageSingleBird()); // Changed from SpawnBirds()
-        StartCoroutine(SpawnLeaves());
+        StartCoroutine(ManageSingleBird());
+        StartCoroutine(SpawnStars());
     }
 
     IEnumerator SpawnClouds()
     {
         while (true)
         {
-            if (cloudPool != null)
+            if (cloudPool != null && mainCamera != null)
             {
                 GameObject cloud = cloudPool.GetPooledCloud();
                 if (cloud != null)
                 {
-                    // Spawn clouds within the defined area
                     float spawnX = Random.Range(cloudSpawnAreaXMin, cloudSpawnAreaXMax);
                     float spawnY = Random.Range(cloudSpawnAreaYMin, cloudSpawnAreaYMax);
                     cloud.transform.position = new Vector3(spawnX, spawnY, 0);
@@ -61,13 +73,19 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    IEnumerator SpawnLeaves()
+    IEnumerator SpawnStars()
     {
         while (true)
         {
-            Vector3 spawnPosition = new Vector3(Random.Range(-spawnAreaWidth, spawnAreaWidth), Camera.main.orthographicSize, 0);
-            Instantiate(leafPrefab, spawnPosition, Quaternion.identity);
-            yield return new WaitForSeconds(leafSpawnInterval);
+            if (mainCamera != null)
+            {
+                // Spawn stars at random positions on the top half of the camera view
+                float spawnX = Random.Range(-mainCamera.orthographicSize * mainCamera.aspect, mainCamera.orthographicSize * mainCamera.aspect);
+                float spawnY = Random.Range(0f, mainCamera.orthographicSize); // Y range adjusted
+                Vector3 spawnPosition = new Vector3(spawnX, spawnY, 0);
+                Instantiate(starPrefab, spawnPosition, Quaternion.identity);
+            }
+            yield return new WaitForSeconds(starSpawnInterval);
         }
     }
 
@@ -75,7 +93,7 @@ public class Spawner : MonoBehaviour
     {
         while (true)
         {
-            if (currentBird == null && canSpawnBird && availablePerches.Count > 0)
+            if (currentBird == null && canSpawnBird && availablePerches.Count > 0 && mainCamera != null)
             {
                 canSpawnBird = false;
 
@@ -118,6 +136,13 @@ public class Spawner : MonoBehaviour
 
     private Vector3 GetBirdSpawnPosition()
     {
-        return new Vector3(Random.Range(-spawnAreaWidth, spawnAreaWidth), Camera.main.orthographicSize + 2f, 0);
+        if (mainCamera != null)
+        {
+            return new Vector3(Random.Range(-spawnAreaWidth, spawnAreaWidth), mainCamera.orthographicSize + 2f, 0);
+        }
+        else
+        {
+            return Vector3.zero;
+        }
     }
 }

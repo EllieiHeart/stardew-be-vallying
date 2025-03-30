@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8096367714460023632}
   - component: {fileID: 5955315859224463802}
-  - component: {fileID: -4603496733141570105}
+  - component: {fileID: -4825356072531205460}
   m_Layer: 0
   m_Name: star2
   m_TagString: Untagged
@@ -88,7 +88,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-4603496733141570105
+--- !u!114 &-4825356072531205460
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,16 +97,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3231677581885443523}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2cf2ea2bb5addf439b83830411eabd8, type: 3}
+  m_Script: {fileID: 11500000, guid: 8e0e4b88561b2424dba415d87f652da3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSpeed: 0.5
-  maxSpeed: 1.5
-  minDrift: -0.2
-  maxDrift: 0.2
-  minSize: 50
-  maxSize: 100
-  gatherTime: 10
-  gatherGrowthRate: 0.2
-  gatherFadeRate: 1
-  dissipateFadeRate: 2
+  fadeInTime: 2
+  minFallSpeed: 0.2
+  maxFallSpeed: 0.5
+  minSize: 0.5
+  maxSize: 2
+  spawnDistanceInterval: 1
+  lifeTime: 5

@@ -9,20 +9,22 @@ public class Spawner : MonoBehaviour
     public GameObject birdPrefab;
     public float birdSpawnDelay = 5f;
     public GameObject starPrefab;
+    public GameObject mrQiPrefab;
 
     public float cloudSpawnInterval = 2f;
     public float birdSpawnInterval = 10f;
     public float starSpawnInterval = 1f;
+    public float mrQiSpawnDelay = 60f;
 
     public float cloudSpawnAreaXMin = -8f;
     public float cloudSpawnAreaXMax = -2f;
     public float cloudSpawnAreaYMin = -4f;
     public float cloudSpawnAreaYMax = 4f;
 
-    public float starSpawnAreaXMin = -10f; // Adjusted for full width
-    public float starSpawnAreaXMax = 10f;  // Adjusted for full width
-    public float starSpawnAreaYMin = 0f;    // Stars spawn only on the top half
-    public float starSpawnAreaYMax = 8f;    // Stars spawn only on the top half
+    public float starSpawnAreaXMin = -10f;
+    public float starSpawnAreaXMax = 10f;
+    public float starSpawnAreaYMin = 0f;
+    public float starSpawnAreaYMax = 8f;
 
     public float spawnAreaWidth = 12f;
 
@@ -36,22 +38,30 @@ public class Spawner : MonoBehaviour
 
     void Start()
     {
+        // 1. Cache the main camera
         mainCamera = Camera.main;
-
         if (mainCamera == null)
         {
             Debug.LogError("Main Camera not found! Spawning may not work correctly.");
+            return; // Important: Exit Start() if no camera
         }
 
+        // 2. Find the CloudPool
         cloudPool = Object.FindFirstObjectByType<CloudPool>();
         if (cloudPool == null)
         {
             Debug.LogError("CloudPool not found in the scene! Clouds will not spawn.");
+            return; // Important: Exit Start() if no CloudPool
         }
+
+        // 3. Initialize available perches (even if empty)
         availablePerches = new List<Transform>(birdPerches);
+
+        // 4. Start coroutines (in a specific order)
         StartCoroutine(SpawnClouds());
         StartCoroutine(ManageSingleBird());
         StartCoroutine(SpawnStars());
+        StartCoroutine(SpawnMrQi());
     }
 
     IEnumerator SpawnClouds()
@@ -79,9 +89,8 @@ public class Spawner : MonoBehaviour
         {
             if (mainCamera != null)
             {
-                // Spawn stars at random positions on the top half of the camera view
                 float spawnX = Random.Range(-mainCamera.orthographicSize * mainCamera.aspect, mainCamera.orthographicSize * mainCamera.aspect);
-                float spawnY = Random.Range(0f, mainCamera.orthographicSize); // Y range adjusted
+                float spawnY = Random.Range(starSpawnAreaYMin, starSpawnAreaYMax);
                 Vector3 spawnPosition = new Vector3(spawnX, spawnY, 0);
                 Instantiate(starPrefab, spawnPosition, Quaternion.identity);
             }
@@ -110,6 +119,21 @@ public class Spawner : MonoBehaviour
                 }
             }
             yield return null;
+        }
+    }
+
+    IEnumerator SpawnMrQi()
+    {
+        yield return new WaitForSeconds(mrQiSpawnDelay);
+
+        if (mainCamera != null && mrQiPrefab != null)
+        {
+            float spawnX = -mainCamera.orthographicSize * mainCamera.aspect - 2f;
+            float spawnY = 0f;
+            Vector3 spawnPosition = new Vector3(spawnX, spawnY, 0);
+            GameObject mrQi = Instantiate(mrQiPrefab, spawnPosition, Quaternion.identity);
+
+            MrQi mrQiScript = mrQi.AddComponent<MrQi>();
         }
     }
 

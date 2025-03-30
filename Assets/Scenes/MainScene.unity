@@ -407,7 +407,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -607,7 +607,7 @@ Transform:
   m_GameObject: {fileID: 1137112878}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0011, y: 0.00285, z: 0}
+  m_LocalPosition: {x: 0.0011, y: 0.00285, z: 11.84}
   m_LocalScale: {x: 1.0321949, y: 0.92543155, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -785,9 +785,11 @@ MonoBehaviour:
   birdPrefab: {fileID: 966318309382055361, guid: 3d7fb907c3e4f644ea2f19e5b2b2805a, type: 3}
   birdSpawnDelay: 5
   starPrefab: {fileID: 3231677581885443523, guid: 9692de3c82fb6ee46899876c87e97105, type: 3}
+  mrQiPrefab: {fileID: 9010709484311907815, guid: c1739a8579d44f646876e78686f6e236, type: 3}
   cloudSpawnInterval: 15
   birdSpawnInterval: 10
   starSpawnInterval: 2
+  mrQiSpawnDelay: 20
   cloudSpawnAreaXMin: -8
   cloudSpawnAreaXMax: -20
   cloudSpawnAreaYMin: -4

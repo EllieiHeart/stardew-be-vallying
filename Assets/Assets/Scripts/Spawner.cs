@@ -7,21 +7,21 @@ public class Spawner : MonoBehaviour
 {
     public GameObject cloudPrefab;
     public GameObject birdPrefab;
-    public float birdSpawnDelay = 5f; // Delay before a new bird spawns
+    public float birdSpawnDelay = 5f;
     public GameObject leafPrefab;
 
-    public float cloudSpawnInterval = 5f;
+    public float cloudSpawnInterval = 2f;
+    public float birdSpawnInterval = 10f;
     public float leafSpawnInterval = 2f;
 
-    public float spawnAreaWidth = 10f;
-    public float spawnAreaHeight = 6f;
+    public float spawnAreaWidth = 12f;
 
-    public Transform[] birdPerches; // Assign the perch points in the Inspector
+    public Transform[] birdPerches;
 
     private List<Transform> availablePerches;
     private bool canSpawnBird = true;
     private CloudPool cloudPool;
-    private GameObject currentBird; // To track the currently active bird
+    private GameObject currentBird;
 
     void Start()
     {
@@ -32,8 +32,9 @@ public class Spawner : MonoBehaviour
         }
         availablePerches = new List<Transform>(birdPerches);
         StartCoroutine(SpawnClouds());
+        StartCoroutine(SpawnBirds());
         StartCoroutine(SpawnLeaves());
-        StartCoroutine(ManageSingleBird()); // Start the coroutine to manage the single bird
+        StartCoroutine(ManageSingleBird());
     }
 
     IEnumerator SpawnClouds()
@@ -45,7 +46,9 @@ public class Spawner : MonoBehaviour
                 GameObject cloud = cloudPool.GetPooledCloud();
                 if (cloud != null)
                 {
-                    cloud.transform.position = new Vector3(Random.Range(-spawnAreaWidth, spawnAreaWidth), -spawnAreaHeight, 0);
+                    // Spawn clouds at a random position within the camera's view
+                    float spawnY = Random.Range(-Camera.main.orthographicSize, Camera.main.orthographicSize);
+                    cloud.transform.position = new Vector3(-Camera.main.orthographicSize * Camera.main.aspect - 1f, spawnY, 0);
                     cloud.SetActive(true);
                 }
             }
@@ -53,11 +56,17 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    IEnumerator SpawnBirds()
+    {
+        // This coroutine is now empty. The bird spawning is handled entirely by ManageSingleBird()
+        yield return null;
+    }
+
     IEnumerator SpawnLeaves()
     {
         while (true)
         {
-            Vector3 spawnPosition = new Vector3(Random.Range(-spawnAreaWidth, spawnAreaWidth), spawnAreaHeight, 0);
+            Vector3 spawnPosition = new Vector3(Random.Range(-spawnAreaWidth, spawnAreaWidth), Camera.main.orthographicSize, 0);
             Instantiate(leafPrefab, spawnPosition, Quaternion.identity);
             yield return new WaitForSeconds(leafSpawnInterval);
         }
@@ -69,14 +78,12 @@ public class Spawner : MonoBehaviour
         {
             if (currentBird == null && canSpawnBird && availablePerches.Count > 0)
             {
-                canSpawnBird = false; // Prevent immediate spawning
+                canSpawnBird = false;
 
-                // Choose a random available perch
                 int randomIndex = Random.Range(0, availablePerches.Count);
                 Transform targetPerch = availablePerches[randomIndex];
-                availablePerches.RemoveAt(randomIndex); // Mark perch as occupied
+                availablePerches.RemoveAt(randomIndex);
 
-                // Spawn the bird
                 GameObject newBirdObj = Instantiate(birdPrefab, GetBirdSpawnPosition(), Quaternion.identity);
                 currentBird = newBirdObj;
                 Bird birdScript = currentBird.GetComponent<Bird>();
@@ -85,40 +92,33 @@ public class Spawner : MonoBehaviour
                     birdScript.SetTargetPerchAndSpawner(targetPerch, this);
                 }
             }
-            yield return null; // Wait for the next frame
+            yield return null;
         }
     }
 
     public void BirdDespawned()
     {
-        currentBird = null; // The bird has despawned
-        StartCoroutine(EnableBirdSpawn()); // Start the delay before a new bird can spawn
+        currentBird = null;
+        StartCoroutine(EnableBirdSpawn());
     }
 
     IEnumerator EnableBirdSpawn()
     {
         yield return new WaitForSeconds(birdSpawnDelay);
         canSpawnBird = true;
-        // When a new bird can spawn, also make the perch available again
         if (birdPerches.Length > 0)
         {
-            // Since we don't know which perch the bird went to, we'll just add one back.
-            // A more robust system might track which perch was used.
-            // For simplicity, we assume a perch becomes free after a bird cycle.
             Transform lastUsedPerch = birdPerches.Except(availablePerches).FirstOrDefault();
             if (lastUsedPerch != null && !availablePerches.Contains(lastUsedPerch))
             {
                 availablePerches.Add(lastUsedPerch);
             }
-            // To prevent the availablePerches from growing indefinitely if birds keep using the same few,
-            // we can reset the available perches each time a bird despawns.
             availablePerches = new List<Transform>(birdPerches);
         }
     }
 
     private Vector3 GetBirdSpawnPosition()
     {
-        // Define a specific spawn area for birds
-        return new Vector3(Random.Range(-spawnAreaWidth, spawnAreaWidth), spawnAreaHeight + 2f, 0); // Spawn slightly above the view
+        return new Vector3(Random.Range(-spawnAreaWidth, spawnAreaWidth), Camera.main.orthographicSize + 2f, 0);
     }
 }

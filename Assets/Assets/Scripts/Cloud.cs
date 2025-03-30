@@ -1,76 +1,79 @@
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Cloud : MonoBehaviour
 {
     public float minSpeed = 0.5f;
     public float maxSpeed = 1.5f;
-    public float minDrift = -0.2f;
-    public float maxDrift = 0.2f;
-    public float minSize = 50f;
-    public float maxSize = 100f;
-    public float gatherTime = 10f;
-    public float gatherGrowthRate = 0.2f;
-    public float gatherFadeRate = 1f;
-    public float dissipateFadeRate = 2f;
+    public float minDriftSpeed = 0.1f;
+    public float maxDriftSpeed = 0.5f;
+    public float minSize = 1f;
+    public float maxSize = 2f;
 
     private float speed;
     private float drift;
     private float size;
     private float alpha = 1f;
-    private string state = "drifting";
-    private float stateTimer = 0f;
     private SpriteRenderer spriteRenderer;
+    private CloudPool cloudPool;
+    private float driftDirection = 1f; // Always drift right
 
-    void Start()
+    void OnEnable()
     {
         speed = Random.Range(minSpeed, maxSpeed);
-        drift = Random.Range(minDrift, maxDrift);
+        drift = Random.Range(minDriftSpeed, maxDriftSpeed) * driftDirection;
         size = Random.Range(minSize, maxSize);
         transform.localScale = new Vector3(size, size, 1f);
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        alpha = 1f;
         Color color = spriteRenderer.color;
         color.a = alpha;
         spriteRenderer.color = color;
     }
 
+    void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        cloudPool = Object.FindFirstObjectByType<CloudPool>();
+        if (cloudPool == null)
+        {
+            Debug.LogError("CloudPool not found in the scene!");
+        }
+    }
+
     void Update()
     {
-        transform.Translate(0, -speed * Time.deltaTime, 0);
-        transform.Translate(drift * Time.deltaTime, 0, 0);
+        transform.Translate(drift * Time.deltaTime, -speed * Time.deltaTime, 0); // Drift on X, Speed on Y
 
-        if (state == "drifting")
+        // Despawn when off-screen to the right
+        if (transform.position.x > Camera.main.orthographicSize * Camera.main.aspect + maxSize)
         {
-            if (Random.value < 0.001f) // 0.1% chance to gather
-            {
-                state = "gathering";
-                stateTimer = gatherTime;
-            }
-        }
-        else if (state == "gathering")
-        {
-            size += gatherGrowthRate * Time.deltaTime;
-            alpha -= gatherFadeRate * Time.deltaTime;
-            stateTimer -= Time.deltaTime;
-            if (stateTimer <= 0)
-            {
-                state = "drifting";
-            }
+            ReturnToPool();
+            return;
         }
 
-        if (transform.position.y < Camera.main.orthographicSize * -1) // Reached top
+        // Despawn when off-screen to the top
+        if (transform.position.y > Camera.main.orthographicSize + maxSize)
         {
-            state = "dissipating";
-            alpha -= dissipateFadeRate * Time.deltaTime;
+            ReturnToPool();
+            return;
         }
 
-        transform.localScale = new Vector3(size, size, 1f);
-        Color currentColor = spriteRenderer.color;
-        currentColor.a = alpha;
-        spriteRenderer.color = currentColor;
-
-        if (alpha <= 0)
+        // Despawn when off-screen to the bottom
+        if (transform.position.y < -Camera.main.orthographicSize - maxSize)
         {
-            
+            ReturnToPool();
+            return;
+        }
+    }
+
+    void ReturnToPool()
+    {
+        if (cloudPool != null)
+        {
+            cloudPool.ReturnCloudToPool(gameObject);
+        }
+        else
+        {
             Destroy(gameObject);
         }
     }

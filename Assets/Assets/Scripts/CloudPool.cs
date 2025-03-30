@@ -11,6 +11,11 @@ public class CloudPool : MonoBehaviour
     void Start()
     {
         pooledClouds = new List<GameObject>();
+        if (cloudPrefab == null)
+        {
+            Debug.LogError("Cloud Prefab is not assigned in the CloudPool!");
+            return;
+        }
         for (int i = 0; i < poolSize; i++)
         {
             GameObject cloud = Instantiate(cloudPrefab);
@@ -23,7 +28,7 @@ public class CloudPool : MonoBehaviour
     {
         for (int i = 0; i < pooledClouds.Count; i++)
         {
-            if (!pooledClouds[i].activeInHierarchy)
+            if (pooledClouds[i] != null && !pooledClouds[i].activeInHierarchy)
             {
                 return pooledClouds[i];
             }
@@ -33,6 +38,9 @@ public class CloudPool : MonoBehaviour
 
     public void ReturnCloudToPool(GameObject cloud)
     {
-        cloud.SetActive(false);
+        if (cloud != null)
+        {
+            cloud.SetActive(false);
+        }
     }
 }

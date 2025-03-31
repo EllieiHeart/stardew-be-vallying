@@ -99,7 +99,7 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    IEnumerator ManageSingleBird()
+        IEnumerator ManageSingleBird()
     {
         while (true)
         {
@@ -119,7 +119,7 @@ public class Spawner : MonoBehaviour
                 if (birdScript != null)
                 {
                     birdScript.SetTargetPerchAndSpawner(targetPerch, this);
-                    birdScript.ChangeState(Bird.BirdState.FlyingToPerch);
+                    birdScript.ChangeState(Bird.BirdState.FlyingAround); // First fly around
                 }
 
                 yield return new WaitForSeconds(birdSpawnDelay);
@@ -131,6 +131,7 @@ public class Spawner : MonoBehaviour
             }
         }
     }
+
 
     IEnumerator ManageMrQiSpawning()
     {

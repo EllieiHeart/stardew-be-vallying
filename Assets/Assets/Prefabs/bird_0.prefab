@@ -100,16 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a2043670a37891438eb680237623ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
-  forageTime: 2
-  perchTime: 3
-  forageDip: 0.5
-  perchPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  currentBirdState: 0
+  HorizontalDistance: 6
+  HorazontalSpeed: 2
+  VerticalSpeed: -1

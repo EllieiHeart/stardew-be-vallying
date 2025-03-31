@@ -6,6 +6,11 @@ public class Bird : MonoBehaviour
 
     public BirdState currentBirdState;
     private Transform targetPerch;
+
+    public float HorizontalDistance;
+
+    public float HorazontalSpeed;
+    public float VerticalSpeed;
     private float stateTimer;
     private float lifeTimer = 15f; // Time before bird flies away
     private float flySpeed = 3f; // Default speed of bird flying
@@ -147,8 +152,16 @@ public class Bird : MonoBehaviour
         if (stateTimer > 0)
         {
             // Move the bird towards the random flight target with its normal fly speed
-            float step = flySpeed * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, randomFlightTarget, step);
+            // float step = flySpeed * Time.deltaTime;
+            // transform.position = Vector3.MoveTowards(transform.position, randomFlightTarget, step);
+
+
+            Vector2 NewPosition = transform.position;
+            NewPosition.x = Mathf.Sin(Time.time * HorazontalSpeed) * HorizontalDistance; 
+            NewPosition.y += Time.deltaTime * VerticalSpeed;
+            transform.position = NewPosition;
+            
+
 
             // Flip the sprite based on the movement direction
             FlipSpriteBasedOnMovement();

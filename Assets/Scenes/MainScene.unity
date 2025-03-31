@@ -929,7 +929,7 @@ MonoBehaviour:
   birdSpawnDelay: 5
   starPrefab: {fileID: 3231677581885443523, guid: 9692de3c82fb6ee46899876c87e97105, type: 3}
   mrQiPrefab: {fileID: 9010709484311907815, guid: c1739a8579d44f646876e78686f6e236, type: 3}
-  cloudSpawnInterval: 15
+  cloudSpawnInterval: 10
   birdSpawnInterval: 5
   starSpawnInterval: 2
   mrQiSpawnDelay: 60

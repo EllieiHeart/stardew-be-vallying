@@ -17,8 +17,7 @@ public class Spawner : MonoBehaviour
     public float starSpawnInterval = 1f;
     public float mrQiSpawnDelay = 60f;
 
-    public float cloudSpawnAreaXMin = -8f;
-    public float cloudSpawnAreaXMax = -2f;
+    // Cloud spawn area (we will calculate based on the camera's view)
     public float cloudSpawnAreaYMin = -4f;
     public float cloudSpawnAreaYMax = 4f;
 
@@ -65,25 +64,44 @@ public class Spawner : MonoBehaviour
         StartCoroutine(ManageMrQiSpawning());
     }
 
+    // Coroutine to spawn clouds from the cloud pool
     IEnumerator SpawnClouds()
+{
+    while (true)
     {
-        while (true)
+        if (cloudPool != null && mainCamera != null)
         {
-            if (cloudPool != null && mainCamera != null)
+            // Retrieve a cloud from the pool
+            GameObject cloud = cloudPool.GetPooledCloud();
+            if (cloud != null)
             {
-                GameObject cloud = cloudPool.GetPooledCloud();
-                if (cloud != null)
-                {
-                    float spawnX = Random.Range(cloudSpawnAreaXMin, cloudSpawnAreaXMax);
-                    float spawnY = Random.Range(cloudSpawnAreaYMin, cloudSpawnAreaYMax);
-                    cloud.transform.position = new Vector3(spawnX, spawnY, 0);
-                    cloud.SetActive(true);
-                }
-            }
-            yield return new WaitForSeconds(cloudSpawnInterval);
-        }
-    }
+                // Calculate the camera bounds for spawning the cloud
+                float cameraHalfWidth = mainCamera.orthographicSize * mainCamera.aspect;
+                float spawnX = 0f;
 
+                // Randomly choose to spawn from the left or right side
+                if (Random.value < 0.5f)
+                {
+                    spawnX = -cameraHalfWidth - 2f; // Spawn from the left side
+                }
+                else
+                {
+                    spawnX = cameraHalfWidth + 2f; // Spawn from the right side
+                }
+
+                float spawnY = Random.Range(cloudSpawnAreaYMin, cloudSpawnAreaYMax);
+                cloud.transform.position = new Vector3(spawnX, spawnY, 0);
+                cloud.SetActive(true);
+            }
+        }
+        yield return new WaitForSeconds(cloudSpawnInterval);
+    }
+}
+
+
+
+
+    // Coroutine to spawn stars
     IEnumerator SpawnStars()
     {
         while (true)
@@ -99,7 +117,8 @@ public class Spawner : MonoBehaviour
         }
     }
 
-        IEnumerator ManageSingleBird()
+    // Coroutine to manage bird spawning
+    IEnumerator ManageSingleBird()
     {
         while (true)
         {
@@ -132,7 +151,7 @@ public class Spawner : MonoBehaviour
         }
     }
 
-
+    // Coroutine to manage Mr. Qi spawning
     IEnumerator ManageMrQiSpawning()
     {
         while (true)
@@ -154,12 +173,14 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    // Method to handle bird despawn and enable bird spawning again
     public void BirdDespawned()
     {
         currentBird = null;
         StartCoroutine(EnableBirdSpawn());
     }
 
+    // Coroutine to enable bird spawning after a delay
     IEnumerator EnableBirdSpawn()
     {
         yield return new WaitForSeconds(birdSpawnDelay);
@@ -175,6 +196,7 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    // Method to get the bird's spawn position
     private Vector3 GetBirdSpawnPosition()
     {
         if (mainCamera != null)

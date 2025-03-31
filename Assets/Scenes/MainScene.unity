@@ -931,8 +931,8 @@ MonoBehaviour:
   mrQiPrefab: {fileID: 9010709484311907815, guid: c1739a8579d44f646876e78686f6e236, type: 3}
   cloudSpawnInterval: 10
   birdSpawnInterval: 5
-  starSpawnInterval: 2
-  mrQiSpawnDelay: 60
+  starSpawnInterval: 1
+  mrQiSpawnDelay: 30
   cloudSpawnAreaYMin: -4
   cloudSpawnAreaYMax: 5
   starSpawnAreaXMin: -10

@@ -1,4 +1,6 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 
 public class Star : MonoBehaviour
@@ -10,14 +12,21 @@ public class Star : MonoBehaviour
     public float maxSize = 1.5f;
     public float lifeTime = 5f; // Lifetime of the star before it dies
 
+    public float ShootingHorazontalSpeed;
+    public float ShootingGravity;
+
+
+    private float ShootingFallSpeed;
     private SpriteRenderer spriteRenderer;
     private float alpha = 0f;
     private float timer = 0f;
     private float fallSpeed;
     private float size;
+    private GameObject mrQi; // Reference to Mr. Qi
+    
 
     // Define the states for the star
-    private enum StarState { Spawning, Falling, Dying }
+    private enum StarState { Spawning, Falling, Dying, Shooting, Crashing }
     private StarState currentState;
 
     void Awake()
@@ -40,6 +49,18 @@ public class Star : MonoBehaviour
 
     void Update()
     {
+         // Try to find Mr. Qi in the scene
+        mrQi = GameObject.FindGameObjectWithTag("MrQi");
+        if (mrQi != null)
+        {
+            // If Mr. Qi is already in the scene, start chasing him immediately
+            
+            currentState = StarState.Shooting;
+        }
+
+
+        
+        
         timer += Time.deltaTime;
 
         // Handle state transitions and behaviors
@@ -48,12 +69,30 @@ public class Star : MonoBehaviour
             case StarState.Spawning:
                 SpawningBehavior();
                 break;
+            
             case StarState.Falling:
                 FallingBehavior();
                 break;
+
+            case StarState.Crashing:
+                CrashingBehavior();
+                break;
+
+            case StarState.Shooting:
+                ShootingBehavior();
+                break;
+
             case StarState.Dying:
                 DyingBehavior();
                 break;
+        }
+
+        if (alpha < 1f && timer < fadeInTime)
+        {
+            alpha = timer / fadeInTime;
+            Color color = spriteRenderer.color;
+            color.a = alpha;
+            spriteRenderer.color = color;
         }
 
         // Despawn condition
@@ -73,13 +112,7 @@ public class Star : MonoBehaviour
     private void SpawningBehavior()
     {
         // Fade in
-        if (alpha < 1f && timer < fadeInTime)
-        {
-            alpha = timer / fadeInTime;
-            Color color = spriteRenderer.color;
-            color.a = alpha;
-            spriteRenderer.color = color;
-        }
+        
 
         // Transition to Falling state once the fade-in is complete
         if (timer >= fadeInTime)
@@ -116,5 +149,21 @@ public class Star : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void ShootingBehavior()
+    {
+        ShootingFallSpeed -= ShootingGravity * Time.deltaTime;
+
+        Vector2 Velocity = new Vector2(ShootingHorazontalSpeed, ShootingFallSpeed);
+        transform.Translate(Velocity * Time.deltaTime);
+
+    }
+
+    private void CrashingBehavior()
+    {
+
+
+        
     }
 }

@@ -13,7 +13,7 @@ public class Bird : MonoBehaviour
     public float VerticalSpeed;
     private float stateTimer;
     private float lifeTimer = 15f; // Time before bird flies away
-    private float flySpeed = 3f; // Default speed of bird flying
+    private float flySpeed = 1f; // Default speed of bird flying
     private float increasedFlySpeed = 6f; // Increased speed when flying to perch
     private float perchStayTimeMin = 2f; // Min time to stay perched
     private float perchStayTimeMax = 5f; // Max time to stay perched
@@ -29,6 +29,12 @@ public class Bird : MonoBehaviour
 
     void Start()
     {
+        
+    }
+
+    void Update()
+    {
+
         // Try to find Mr. Qi in the scene
         mrQi = GameObject.FindGameObjectWithTag("MrQi");
         if (mrQi != null)
@@ -37,10 +43,8 @@ public class Bird : MonoBehaviour
             chaseTarget = mrQi.transform;
             ChangeState(BirdState.Chasing);
         }
-    }
 
-    void Update()
-    {
+
         stateTimer -= Time.deltaTime;
         lifeTimer -= Time.deltaTime;
 
@@ -201,6 +205,10 @@ public class Bird : MonoBehaviour
 
     private void ChaseTarget()
     {
+
+        if (mrQi == null)
+            ChangeState(BirdState.FlyingAround);
+
         if (chaseTarget != null)
         {
             float step = flySpeed * Time.deltaTime;

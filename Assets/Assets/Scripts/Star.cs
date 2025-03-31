@@ -1,6 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 public class Star : MonoBehaviour
@@ -11,6 +12,9 @@ public class Star : MonoBehaviour
     public float minSize = 0.5f;
     public float maxSize = 1.5f;
     public float lifeTime = 5f; // Lifetime of the star before it dies
+    public ParticleSystem CrashParticles;
+    public ParticleSystem BurnParticles;
+    public float GroundPosition;
 
     public float ShootingHorazontalSpeed;
     public float ShootingGravity;
@@ -51,13 +55,19 @@ public class Star : MonoBehaviour
     {
          // Try to find Mr. Qi in the scene
         mrQi = GameObject.FindGameObjectWithTag("MrQi");
-        if (mrQi != null)
+        if (mrQi != null && currentState != StarState.Crashing)
         {
             // If Mr. Qi is already in the scene, start chasing him immediately
-            
+
             currentState = StarState.Shooting;
         }
 
+        if (transform.position.y <= GroundPosition && currentState != StarState.Crashing) {
+            currentState = StarState.Crashing;
+
+            CrashParticles.Play();
+            BurnParticles.Play();
+        }
 
         
         
@@ -162,8 +172,8 @@ public class Star : MonoBehaviour
 
     private void CrashingBehavior()
     {
-
-
+        
+        Destroy(gameObject, 5);
         
     }
 }

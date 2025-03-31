@@ -26,6 +26,12 @@ public class Bird : MonoBehaviour
     {
         // Try to find Mr. Qi in the scene
         mrQi = GameObject.FindGameObjectWithTag("MrQi");
+        if (mrQi != null)
+        {
+            // If Mr. Qi is already in the scene, start chasing him immediately
+            chaseTarget = mrQi.transform;
+            ChangeState(BirdState.Chasing);
+        }
     }
 
     void Update()
@@ -33,29 +39,30 @@ public class Bird : MonoBehaviour
         stateTimer -= Time.deltaTime;
         lifeTimer -= Time.deltaTime;
 
-        if (lifeTimer <= 0)
-        {
-            ChangeState(BirdState.FlyingAway); // All birds eventually fly away
-        }
-
-        // Check if Mr. Qi is in the scene and active
+        // If Mr. Qi has just spawned or become active, switch to chasing
         if (mrQi != null && mrQi.activeInHierarchy)
         {
-            // Only change state to Chasing if not already in Chasing state
+            // If the bird is not already chasing Mr. Qi, start chasing him immediately
             if (currentBirdState != BirdState.Chasing)
             {
                 chaseTarget = mrQi.transform;
-                ChangeState(BirdState.Chasing); // Transition to Chasing if Mr. Qi is visible
+                ChangeState(BirdState.Chasing); // Immediate state change to Chasing
             }
         }
         else
         {
-            // Check if Mr. Qi is off-screen
+            // If Mr. Qi is no longer in the scene, go back to flying state
             if (chaseTarget != null && !IsTargetVisible(mrQi.transform))
             {
-                chaseTarget = null; // Clear chase target if Mr. Qi is no longer visible
-                ChangeState(BirdState.FlyingAround); // Go back to flying behavior if Mr. Qi goes off-screen
+                chaseTarget = null; // Clear the chase target
+                ChangeState(BirdState.FlyingAround); // Transition back to flying behavior
             }
+        }
+
+        // If life time ends, the bird should fly away
+        if (lifeTimer <= 0)
+        {
+            ChangeState(BirdState.FlyingAway); // All birds eventually fly away
         }
 
         switch (currentBirdState)
@@ -189,7 +196,7 @@ public class Bird : MonoBehaviour
             // Flip the sprite based on the movement direction
             FlipSpriteBasedOnMovement();
 
-            // If the bird reaches the Mr. Qi (or goes off-screen), stop chasing
+            // If the bird reaches Mr. Qi (or goes off-screen), stop chasing
             if (!IsTargetVisible(chaseTarget))
             {
                 chaseTarget = null; // Clear the chase target when Mr. Qi goes off-screen
@@ -206,19 +213,19 @@ public class Bird : MonoBehaviour
 
     private void FlipSpriteBasedOnMovement()
     {
-        // Detect if the bird is moving to the left or right based on the random flight target
-        float direction = Mathf.Sign(transform.position.x - randomFlightTarget.x); 
+        // Flip the sprite based on the direction of movement
+        float horizontalMove = transform.position.x - randomFlightTarget.x;
 
-        if (direction < 0) // Moving left
+        if (horizontalMove < 0) // Moving left
         {
             Vector3 scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x); // Keep normal sprite (facing right)
+            scale.x = -Mathf.Abs(scale.x); // Invert the sprite (flip it)
             transform.localScale = scale;
         }
-        else if (direction > 0) // Moving right
+        else if (horizontalMove > 0) // Moving right
         {
             Vector3 scale = transform.localScale;
-            scale.x = -Mathf.Abs(scale.x); // Flip the sprite to face left
+            scale.x = Mathf.Abs(scale.x); // Keep the sprite normal
             transform.localScale = scale;
         }
     }
@@ -228,7 +235,7 @@ public class Bird : MonoBehaviour
     {
         if (targetPerch != null)
         {
-            if (targetPerch.position.x > transform.position.x) 
+            if (targetPerch.position.x > transform.position.x)
             {
                 // The perch is to the right, flip the sprite
                 Vector3 scale = transform.localScale;
@@ -254,7 +261,7 @@ public class Bird : MonoBehaviour
         // Once the bird has reached the fly away target, destroy the bird
         if (transform.position == flyAwayTarget)
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // The bird leaves the scene after flying away
         }
     }
 
